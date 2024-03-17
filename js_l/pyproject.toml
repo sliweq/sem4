@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "sem4"
+version = "0.1.0"
+description = ""
+authors = ["Jakub Śliwka <kubapplll@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+albatros-uav = "^0.8.1"
+streamlit = "^1.32.0"
+taskipy = "^1.12.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.taskipy.tasks]
+strona = "streamlit hello"
