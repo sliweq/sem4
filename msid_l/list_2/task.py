@@ -35,9 +35,9 @@ def get_minor_matrix(mat: List[List[int]], i: int, j: int) -> List[List[int]]:
     """
     new_mat = []
     for row in range(len(mat)):
-        new_col = []
         if row == i: 
             continue
+        new_col = []
         for col in range(len(mat[row])):
             if col == j:
                 continue
