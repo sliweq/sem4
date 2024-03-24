@@ -7,28 +7,25 @@ def get_ip_or_domain(data: str) -> Optional[str]:
     except IndexError: 
         return None
 
-def get_code(data:str) -> Optional[str]:
+def get_code(data:str) -> Optional[int]:
     try:
-        return data.split()[-2]
-    except IndexError: 
+        return int(data.split()[-2])
+    except IndexError or ValueError: 
         return None
 
 def return_send_bytes(data:str) -> Optional[int]: 
     try:
         bytes = data.split(" ")[-1]
-    except IndexError: 
-        return None
-    
-    try:
-        bytes = int(bytes)
+        if bytes == "-":
+            return 0
+        bytes = int(data.split(" ")[-1])
         return bytes
-    except ValueError:
+    except ValueError or IndexError:
         return None   
-
 
 def get_path_from_data(data) -> Optional[str]:
     try:
-        data.split(" ")[6]
+        return data.split(" ")[6]
     except IndexError:
         return None
 
@@ -39,12 +36,21 @@ def get_raw_date(data:str) -> Optional[str]:
         return None
 
 
-def get_date(date:str) -> Optional[datetime.datetime]:
+def get_full_date(date: str) -> Optional[datetime.datetime]:
     try:
-        return datetime.datetime.strptime(date,"%d/%m/%y:%H:%M:%S")
+        return datetime.datetime.strptime(date, "%d/%b/%Y:%H:%M:%S")
     except Exception:
         return None
  
+def get_time(data: datetime.datetime) -> Optional[datetime.datetime]:
+    return data.time()
+
+def get_date(data: datetime.datetime) -> Optional[datetime.datetime]:
+    return data.date()
+    
 
 def contains_pl_domain(data:str) -> Optional[bool]:
-    return data[-3:] == ".pl" 
+    try:
+        return data[-3:] == ".pl" 
+    except IndexError:
+        return None
