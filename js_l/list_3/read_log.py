@@ -1,4 +1,8 @@
 from functions import *
+
+# 199.72.81.55 - - [01/Jul/1995:00:00:01 -0400] "GET /history/apollo/ HTTP/1.0" 200 6245
+# unicomp6.unicomp.net - - [01/Jul/1995:00:00:06 -0400] "GET /shuttle/countdown/ HTTP/1.0" 200 3985
+
 def read_log() -> list:
     """Excercise 2, subpoint a"""
     all_logs = []
