@@ -46,12 +46,23 @@ def get_polynomial_form(polynomial_degree: int) -> np.ndarray:
         [[0], [1], [2], [3]] - 3rd order, and so on...
     :return: a array with degrees of polynomial
     """
-    ...
+    if polynomial_degree < 0:
+        raise ValueError
+    return np.asarray( [[i] for i in range(polynomial_degree+1) ] ) 
 
 
 def print_polynomial(theta: np.ndarray, precission: int = 3) -> str:
     """Return string representation of polynomial."""
-    ...
+    if precission < 0:
+        raise ValueError
+    if len(theta) == 0:
+        return ""
+    answer = ""
+    for i in range(len(theta)):
+        answer += f"{round(float(theta[i][0] ),precission)}*x^{i} + "
+    return answer[:-3]    
+    
+    
 
 
 def least_squares_solution(
@@ -66,7 +77,16 @@ def least_squares_solution(
 
     :return: theta matrix of polynomial, shape = (1, polynomial_degree + 1)
     """
-    ...
+    
+    # (X^T X)^-1 X^T Y
+    polynomial_matrix = get_polynomial_form(polynomial_degree)
+    new_X = np.asarray([[i**j[0] for j in polynomial_matrix] for i in X])
+    new_Y = np.asarray([[i] for i in Y])
+    return np.dot(
+        np.linalg.inv(np.dot(np.transpose(new_X),new_X)),
+        np.dot(np.transpose(new_X),new_Y))
+    
+    
 
 
 def generalised_linear_model(X: np.ndarray, T: np.ndarray) -> np.ndarray:
@@ -102,6 +122,7 @@ def visualise_LSS_method(X: np.ndarray, Y: np.ndarray, T: np.ndarray):
 if __name__ == "__main__":
     # here is a playground for your tests!
     X, Y = read_data_vectors()
-    T = least_squares_solution(X, Y, 2)
+    T = least_squares_solution(X, Y, 6)
     print(print_polynomial(T))
     visualise_LSS_method(X, Y, T)
+

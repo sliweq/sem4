@@ -1,0 +1,12 @@
+Najbardziej dokładny wykres jest dla jest wielomianów 2,3,4 stopnia
+Przy wyższych liczbach krzywa zaczyna wyginać się w góre między ostatnim a przedostatnim punktem
+Dla np. 16, 50 oraz 61 (ostatnia możliwa wartość) krzywa zaczyna mieć jeden punkt przegięcia w dół
+Punkt między przedostatnią i ostatnią wartością na osi X jest "wrażliwy" przez brak danych w tych punktach
+Dla przedstawionego zbioru najlepszy wybór to wielomian 3 stopnia
+
+
+
+Przy rozwiązaywaniu zadania sugerowałem się następującymi źródłami, skąd zaczerpnąłem wzór dla funkcji "least_squares_solution"
+https://en.wikipedia.org/wiki/Polynomial_regression
+https://mathworld.wolfram.com/LeastSquaresFittingPolynomial.html
+https://www.statsoft.pl/textbook/stathome_stat.html?https%3A%2F%2Fwww.statsoft.pl%2Ftextbook%2Fstglm.html
