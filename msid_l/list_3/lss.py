@@ -122,7 +122,7 @@ def visualise_LSS_method(X: np.ndarray, Y: np.ndarray, T: np.ndarray):
 if __name__ == "__main__":
     # here is a playground for your tests!
     X, Y = read_data_vectors()
-    T = least_squares_solution(X, Y, 6)
+    T = least_squares_solution(X, Y, 3)
     print(print_polynomial(T))
     visualise_LSS_method(X, Y, T)
 
