@@ -6,36 +6,32 @@
 using namespace std;    
 
 string get_file_name();
-void run(string file_name);
-void read_from_file(string* file_name);
+int run(string file_name);
+int read_from_file(string* file_name);
 int count_signs(vector <string>* lines);
 int count_words(vector <string>* lines);
 
 int main(int argc, char* argv[]) {
     if (argc == 1) {
-        spdlog::error("This program doesn't take any arguments.");
-        return 0;
+        return 1;
     }
     else{
-        run(argv[1]);
+        return run(argv[1]);
     }
-    return 0;
 }
 
-void run(string file_name) {
+int run(string file_name) {
     if(file_name == "" || file_name == " ") {        
-        spdlog::error("File name is empty.");
-        return;
+        return 1;
     }    
-    read_from_file(&file_name);
+    return read_from_file(&file_name);
 }
 
-void read_from_file(string* file_name) {
+int read_from_file(string* file_name) {
     
     ifstream file(*file_name);
     if (!file.is_open()) {
-        spdlog::error("Can't open file or file not exist.");
-        return;
+        return 1;
     }
     vector <string> lines;
     while (file) {
@@ -45,15 +41,13 @@ void read_from_file(string* file_name) {
     }
     file.close();
 
-    int signs = count_signs(&lines);
-    spdlog::info("Signs in file: {}", signs);
-    int words = count_words(&lines);
-    spdlog::info("Words in file: {}", words);
-    spdlog::info("Lines in file: {}", lines.size()-1);    
-    cout << "xddd";
-    cout << "xddd1";
-    cout << "xddd2";
-
+    cout << 1 << "," << *file_name<<"\n"; 
+    cout << 2 << "," << count_signs(&lines)<<"\n";    
+    cout << 3 << "," << count_words(&lines)<<"\n";
+    cout << 4 << "," << lines.size()-1<<"\n";
+    // cout << 5 << "," << lines.size()<<"\n";
+    // cout << 6 << "," << lines.size()<<"\n";
+    return 0;
 }
 
 string get_file_name() {

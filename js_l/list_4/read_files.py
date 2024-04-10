@@ -1,4 +1,4 @@
-import subprocess,sys,os, logging
+import subprocess,sys,os, logging, csv
 
 logger = logging.getLogger(__name__)
 
@@ -15,14 +15,20 @@ def run():
     else:
         logger.error(f"Path {path} does not exist")
 
-if __name__ == '__main__':
+def run():
+    sum_read_files = 0
+    sum_chars = 0
+    sum_words = 0
+    sum_lines = 0
+    most_common_char = ""
+    most_common_word = ""
+    
     # print(get_path())
     
-    subprocess.run(["./analise_file", "tmp.txt"])
-    while True:
-        try:
-            line = input()
-            print(f"python line: {line}")
-            
-        except EOFError:
-            break
+    x = subprocess.run(["./analise_file", "tmp.txt"],  encoding='ascii', capture_output=True)
+    y = csv.reader(x.stdout.splitlines())
+    for y in y:
+        print(y)    
+
+if __name__ == '__main__':
+    run()
