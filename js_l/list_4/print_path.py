@@ -7,5 +7,5 @@ def print_path(path: str) -> None:
             for j in os.listdir(os.path.join(path, i)):
                 if not os.path.isdir(os.path.join(path, i, j)):
                     print(f'\t- {os.path.join(path, i, j)}')
-
-print_path(os.environ["HOME"])
+if __name__ == '__main__':
+    print_path(os.environ["HOME"])

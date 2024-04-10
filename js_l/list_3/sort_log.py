@@ -24,4 +24,4 @@ def sort_log(log: list, key:SortKey = SortKey.IP) -> Optional[list]:
 if __name__ == "__main__":
     from read_log import read_log
     logs = read_log()
-    print(sort_log(logs, SortKey.IP)[:5])
+    print(sort_log(logs, SortKey.IP))

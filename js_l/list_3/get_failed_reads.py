@@ -11,7 +11,7 @@ def get_failed_reads(logs:list, param:bool = True) -> list:
         elif log[4] // 100 == 4:
             new_logs_4.append(log)
     if param:
-        return new_logs_4 + new_logs_5
+        return [new_logs_4 + new_logs_5]
     return [new_logs_4,new_logs_5]
 
 if __name__ == "__main__":
