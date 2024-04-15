@@ -6,10 +6,14 @@ def print_environ(env:os._Environ, args: list) -> None:
             print(f'{k[0]} - {k[1]}')
     else:
         for k in sorted(env.items()):
-            tmp = list(map(lambda x: x[1:] in k[0].lower()  , args[1:]))
-            if False in tmp:
-                continue
-            print(f'{k[0]} - {k[1]}')
+            for i in args[1:]:
+                if i.lower() not in k[1].lower():
+                    break
+                else:
+                    print(f'{k[0]} - {k[1]}')
+            # if False in tmp:
+            #     continue
+            # print(f'{k[0]} - {k[1]}')
                 
                     
 if __name__ == '__main__':

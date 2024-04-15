@@ -6,6 +6,7 @@ def print_path(path: str) -> None:
             print(f"Path: {os.path.join(path, i)}")
             for j in os.listdir(os.path.join(path, i)):
                 if not os.path.isdir(os.path.join(path, i, j)):
-                    print(f'\t- {os.path.join(path, i, j)}')
+                    if os.path.join(path, i, j).endswith(".sh"):
+                        print(f'\t- {os.path.join(path, i, j)}')
 if __name__ == '__main__':
     print_path(os.environ["HOME"])
