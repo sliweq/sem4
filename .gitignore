@@ -1,4 +1,6 @@
 __pycache__
+*/__pycache__
+*/.pytest_cache
 .pytest_cache
 js_l/list_2/NASA
 js_l/list_3/NASA
@@ -6,6 +8,8 @@ msid_l/list_2/owid-covid-data.csv
 msid_l/list_3/GDP_happiness.csv
 js_l/JakubSliwka.zip
 .vscode
+*/.vscode
+SSH.log
 msid_l/project/
 Titanic.ipynb
 final_task.pdf
