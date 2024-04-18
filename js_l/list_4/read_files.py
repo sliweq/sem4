@@ -1,10 +1,6 @@
 import subprocess,sys,os, logging, csv
 from typing import Optional
 
-# logging.basicConfig(
-#      format= '[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s',
-#      datefmt='%H:%M:%S'
-#  )
 
 def find_most_freq(list_of_words: list[str]) -> str:
     counter = 0

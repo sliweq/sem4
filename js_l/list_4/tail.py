@@ -63,7 +63,7 @@ def read_from_file(file:str, lines:int, follow:bool = False) -> None:
             q = Queue()
             file_size = os.stat(file).st_size
             while 1:
-                currnt_position = f.tell()
+                f.tell()
                 line = f.readline()
                 
                 if not line:
