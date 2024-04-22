@@ -1,3 +1,5 @@
+from queue import Queue
+from main import LOG_LEVEL
 from datetime import datetime
 import re
 from typing import Optional
@@ -6,15 +8,13 @@ from main import Ssh_log
 from ssh_class import MessageType, Shh_session
 import logging
 import statistics
-import argparse
-from main import LOG_LEVEL
 
 logger = logging.getLogger()
 setup_logging(LOG_LEVEL)
 
-def get_date_from_log(month:str,day:str,time:str) -> Optional[datetime]:
+def get_date_from_log(month:str) -> Optional[datetime]:
     try:
-        return datetime.strptime(f"{month} {day} {time}","%b %d %H:%M:%S")
+        return datetime.strptime(f"{month}","%b %d %H:%M:%S")
     except ValueError:
         return None
     
@@ -39,10 +39,12 @@ def get_ipv4s_from_log(log:Ssh_log) -> list[str]:
 
 def get_user_from_message(log:Ssh_log) -> Optional[str]:
     # zadanie 2 c
-    names = re.findall(r" user (\w+)",log.message) 
-    if names: 
-        if names[0] != "unknown":
-            return names[0]
+    patterns = [r" invalid user",r'Failed password for invalid user (\w+)', r'session opened for user (\w+)','session closed for user (\w+)']
+    for pattern in patterns:
+        matches = re.findall(pattern, log.message)
+        if matches:
+            return matches[0]
+            
     return None
 
 def get_all_users(logs:list[Ssh_log]) -> list[str]:
@@ -59,17 +61,18 @@ def draw_users(users:list[str]) -> Optional[str]:
 
 def get_message_type(log:Ssh_log) -> MessageType:
     # zadanie 2 d
-    if "Accepted password for" in log.message:
+    
+    if re.search("Accepted password for", log.message):
         return MessageType.SuccessfulLogin
-    if "authentication failure;" in log.message:
+    if re.search("authentication failure;", log.message):
         return MessageType.FailedLogin
-    if "Received disconnect from" in log.message or "Connection closed by" in log.message:
+    if re.search("Received disconnect from", log.message) or re.search("Connection closed by",log.message):
         return MessageType.ClosedConnection
-    if re.findall(r"Failed password for (\S+) from",log.message):
+    if re.findall(r"Failed password for (\S+) from",log.message):        
         return MessageType.InvalidPassword
-    if "Invalid user" in log.message:
+    if re.search("Invalid user", log.message):
         return MessageType.InvalidUser
-    if "POSSIBLE BREAK-IN ATTEMPT" in log.message:
+    if re.search("POSSIBLE BREAK-IN ATTEMPT", log.message):
         return MessageType.HackAttempt
     
     return MessageType.Other
@@ -90,17 +93,16 @@ def report_log(log:Ssh_log) -> None:
             logger.error(f"Hack attempt")
         case MessageType.Other:
             logger.debug(f"Other message")
-        
-def read_bytes(line:str) -> None:
-    logger.debug(f"Read {len(line)} bytes")
+    
     
 def get_sessions(logs:list[Ssh_log]) -> Shh_session:
     start = []
     close = []
     for log in logs:
-        if " session opened " in log.message:
+        
+        if re.search(" session opened ", log.message):
             start.append(log)
-        if " session closed " in log.message:
+        if re.search(" session closed ", log.message):
             close.append(log)
     return Shh_session(start=start,close=close)
 
@@ -190,3 +192,83 @@ def get_most_less_active_user(logs:list[Ssh_log]) -> None:
     tmp = extract_users_from_sessions(sessions)
     print(f"Most active user: {max(set(tmp), key = tmp.count)}")
     print(f"Least active user: {min(set(tmp), key = tmp.count)}")
+    
+    
+    
+# brute force
+
+class BruteForce():
+    def __init__(self, logs:list[Ssh_log], duration:int = 100, user:str = None):
+        self.logs = logs
+        self.duration = duration
+        self.user = user
+        
+        self.attacs = {} 
+        self.potential_attacks = {}
+        
+        self.duration = duration
+    
+    def run(self) -> list[str]:
+        if self.user:
+            self.run_for_user()
+        else:
+            self.run_for_all()
+        
+        attacks = []
+        
+        for key,values in self.attacs.items():
+            if values:
+                attack = values[0]
+                attack_index = 0
+                tmp = 0
+                while tmp < len(values):
+                    if (values[tmp].date - attack.date).total_seconds() >= self.duration:
+                        attacks.append(f"Attack from {key}, {tmp - attack_index+1} times, attack lasted for: {(values[tmp].date-attack.date).total_seconds()}")
+                        attack = values[tmp]
+                        attack_index = tmp
+                    tmp += 1
+        return attacks
+    
+    def add_log_to_dict(self,log:Ssh_log) -> None:
+
+        if get_ipv4s_from_log(log)[0] not in self.potential_attacks.keys():
+            self.potential_attacks[get_ipv4s_from_log(log)[0]] = Queue()
+            
+        self.potential_attacks[get_ipv4s_from_log(log)[0]].put(log)
+
+    def analize_logs(self, log:Ssh_log) -> None:
+        
+        self.clean_time(log.date)
+        self.add_log_to_dict(log)    
+        
+        for key,velue in self.potential_attacks.items():
+            if velue.qsize() > 5:
+                if key not in self.attacs.keys():
+                    self.attacs[key] = []
+                for queue_values in list(velue.queue):
+                    if queue_values not in self.attacs[key]:
+                        self.attacs[key].append(queue_values)
+        
+    def run_for_user(self) -> None:
+        
+        for log in self.logs:
+            if get_message_type(log) == MessageType.InvalidPassword:
+                if get_user_from_message(log) == self.user:
+                    self.analize_logs(log)
+
+    def run_for_all(self) -> None:
+        for log in self.logs:
+            if get_message_type(log) == MessageType.InvalidPassword:
+                self.analize_logs(log)
+            
+        
+    def clean_time(self, current_time:datetime) -> dict:
+        
+        for key in self.potential_attacks:
+            while( self.potential_attacks[key].qsize() > 0):
+                if(current_time - self.potential_attacks[key].queue[0].date).total_seconds() > self.duration:
+                    self.potential_attacks[key].get()
+                    # print(self.potential_attacks[key].qsize())
+                else:
+                    break
+        return self.potential_attacks

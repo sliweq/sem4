@@ -30,7 +30,7 @@ def setup_logging(log : str) -> None:
 
     stderr_handler = logging.StreamHandler(sys.stderr)
     stderr_handler.setLevel(logging.ERROR)
-    stderr_handler.addFilter(StderrFilter())
+    # stderr_handler.addFilter(StderrFilter())
     logger.addHandler(stderr_handler)
     
 class StdoutFilter(logging.Filter):

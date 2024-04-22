@@ -4,10 +4,10 @@ from datetime import datetime
 from enum import Enum
 
 class Ssh_log(NamedTuple):
-    date: Optional[datetime]
-    serwer: Optional[str]
-    sshd: Optional[str]
-    message: Optional[str]
+    date: datetime
+    serwer: str
+    sshd: str
+    message: str
     
 class MessageType(Enum):
     SuccessfulLogin = 1
