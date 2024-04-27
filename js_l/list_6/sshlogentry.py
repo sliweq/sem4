@@ -11,23 +11,27 @@ class SSHLogEntry(ABC):
         
         self.pid = pid
         self.time = time
-        self.__raw_mess = raw_mess
+        self._raw_mess = raw_mess
         self.user = user
     
     def __str__(self) -> str:
-        return f'{self.time}, {self.host_name}, {self.pid}'
+        if self.user:
+            return f'{self.time}, {self.user}, {self.pid}'
+        return f'{self.time}, {self.pid}'
     
     def getIPv4Address(self) -> Optional[IPv4Address]:
-        ip = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",self.__raw_mess)
+        ip = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",self._raw_mess)
         if not ip:
             return None
         return IPv4Address(ip[0])
     
     def __repr__(self) -> str:
-        return f'SSHLogEntry: {self.time}, {self.host_name}, {self.pid}'
+        if self.user:
+            return f'SSHLogEntry: {self.time}, {self.user}, {self.pid}'
+        return f'SSHLogEntry: {self.time}, {self.pid}'
     
     def __eq__(self, object) -> bool: 
-        return self.time == object.time # and self.host_name == object.host_name and self.pid == object.pid
+        return self.time == object.time # and self.user == object.user and self.pid == object.pid
     
     def __lt__(self, value: object) -> bool: 
         return self.time < value.time
@@ -53,7 +57,8 @@ class SSHLogFailedPasswd(SSHLogEntry):
         self.port = port 
 
     def validate(self) -> bool:
-        match = re.match(self.regex, self.__raw_mess)
+        print(self._raw_mess)
+        match = re.match(self.regex, self._raw_mess)
         
         if match:
             try:
@@ -61,11 +66,14 @@ class SSHLogFailedPasswd(SSHLogEntry):
                 pid = int(match.group(2))
                 message = match.group(3)
             except:
+                print('error')
                 return False
             
             if self.pid != pid:
+                print('pid')
                 return False
             if self.time != time:
+                print('time')
                 return False
         
             patterns = [r" invalid user (\w+)", r'session opened for user (\w+)',r'session closed for user (\w+)', r'Accepted password for (\w+)',
@@ -75,6 +83,7 @@ class SSHLogFailedPasswd(SSHLogEntry):
                 matches = re.findall(pattern, message)
                 if matches:
                     if self.user != matches[0]:
+                        print(self.user, matches[0])
                         return False
             
             port = re.findall(r"port (\d+)",message)
@@ -92,7 +101,7 @@ class SSHLogAcceptedPasswd(SSHLogEntry):
             self.port = port 
 
     def validate(self) -> bool:
-        match = re.match(self.regex, self.__raw_mess)
+        match = re.match(self.regex, self._raw_mess)
         
         if match:
             try:
@@ -127,10 +136,10 @@ class SSHLogAcceptedPasswd(SSHLogEntry):
 class SSHLogError(SSHLogEntry):
     def __init__(self,pid:int,raw_mess:str,time:datetime,error:int,user:str=None) -> None:
         super().__init__(pid,raw_mess,time,user)
-        self.error        
+        self.error = error   
     
     def validate(self) -> bool:
-        match = re.match(self.regex, self.__raw_mess)
+        match = re.match(self.regex, self._raw_mess)
         
         if match:
             try:

@@ -20,7 +20,7 @@ class SSHLogJournal():
             yield log
     
     
-    def append(self,log:str) -> bool: #TODO
+    def append(self,log:str) -> bool:
         failed_passwd = [r'Failed password for invalid user (\w+)', r'Failed password for (\w+)']
         succesful_passwd = r'Accepted password for (\w+)'
         error = r']: error: '
@@ -41,26 +41,30 @@ class SSHLogJournal():
             matches = re.findall(pattern, message)
             if matches:
                 user = matches[0]
+                break
         
         ports = re.findall(r"port (\d+) ssh2",message)
         
-        if re.findall(failed_passwd,log):
-            
-            self.logs.append(SSHLogFailedPasswd(pid=pid,raw_mess=log,time=time,user=user,port=int(ports[0])))
+        if re.findall(failed_passwd[0],log) or re.findall(failed_passwd[1],log):
+            ip = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",log)
+
+            self.logs.append(SSHLogFailedPasswd(pid=pid,raw_mess=log,time=time,user=user,port=int(ports[0]),ipv4=IPv4Address(ip[0])))
             return True
         
         if re.findall(succesful_passwd,log):
-            self.logs.append(SSHLogAcceptedPasswd(pid=pid,raw_mess=log,time=time,user=user,port=int(ports[0])))
+            
+            ip = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",log)
+            self.logs.append(SSHLogAcceptedPasswd(pid=pid,raw_mess=log,time=time,user=user,port=int(ports[0]),ipv4=IPv4Address(ip[0])))
             return True
         if re.findall(error,log):
             match = re.search(r'[^:]+$', log)
             if match:
                 text_after_last_colon = match.group(0).strip()
-                self.logs.append(SSHLogError(pid=pid,raw_mess=log,time=time,error=text_after_last_colon,user=user))
+                self.logs.append(SSHLogError(pid=pid,raw_mess=log,time=time,error=text_after_last_colon))
                 return True
             
         
-        self.logs.append(SSHLogEntry())
+        self.logs.append(SSHLogOther(pid=pid,raw_mess=log,time=time))
         return False
 
     def get_specified_logs(self,start_date:datetime, end_date:datetime, ip_v4 = None ) -> list[SSHLogEntry]:
@@ -75,4 +79,20 @@ class SSHLogJournal():
                     new_logs.append(log)
         
         return new_logs
+    
+    def __getitem__(self, key) -> list[SSHLogEntry]:
+
+        if isinstance(key, int):
+            return [self.logs[key]]
+        if isinstance(key, slice):
+            start = key.start if key.start else 0
+            stop = key.stop if key.stop else len(self.logs)
+            step = key.step if key.step else 1
+            return self.logs[start:stop:step]
+        if isinstance(key, IPv4Address):
+            return [log for log in self.logs if (isinstance(log, SSHLogAcceptedPasswd) or isinstance(log, SSHLogFailedPasswd)) and log.ipv4 == key]
+        if isinstance(key, datetime):
+            return [log for log in self.logs if log.time == key]
         
+        raise TypeError("Invalid argument type")
+
