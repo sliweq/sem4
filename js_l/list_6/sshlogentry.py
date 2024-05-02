@@ -27,8 +27,8 @@ class SSHLogEntry(ABC):
     
     def __repr__(self) -> str:
         if self.user:
-            return f'SSHLogEntry: {self.time}, {self.user}, {self.pid}'
-        return f'SSHLogEntry: {self.time}, {self.pid}'
+            return f'SSHLogEntry: {self.time}, {self.user}, {self.pid}, {self._raw_mess}'
+        return f'SSHLogEntry: {self.time}, {self.pid}, {self._raw_mess}'
     
     def __eq__(self, object) -> bool: 
         return self.time == object.time # and self.user == object.user and self.pid == object.pid
@@ -45,7 +45,7 @@ class SSHLogEntry(ABC):
         pass
     
     @property
-    def has_ip(self) -> bool: #TODO
+    def has_ip(self) -> bool:
         if self.getIPv4Address():
             return True
         return False
@@ -66,14 +66,12 @@ class SSHLogFailedPasswd(SSHLogEntry):
                 pid = int(match.group(2))
                 message = match.group(3)
             except:
-                print('error')
                 return False
             
             if self.pid != pid:
-                print('pid')
                 return False
+            
             if self.time != time:
-                print('time')
                 return False
         
             patterns = [r" invalid user (\w+)", r'session opened for user (\w+)',r'session closed for user (\w+)', r'Accepted password for (\w+)',
