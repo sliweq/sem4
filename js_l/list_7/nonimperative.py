@@ -21,5 +21,3 @@ def make_alpha_dict(alpha: str) -> dict[str, list[str]]:
     
 def flatten(unknown_list : list) -> list:
     return reduce(lambda x, y: x + y, map(flatten, filter(lambda x: isinstance(x, list), unknown_list)),list(filter(lambda x: not isinstance(x, list), unknown_list)))
-
-print(flatten([1,[2,3],1]))    
