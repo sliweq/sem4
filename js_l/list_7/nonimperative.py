@@ -7,7 +7,8 @@ def acronym(phrases:list[str]) -> str:
 
 def median(numbers: list[float]) -> float:
     numbers.sort()
-    return numbers[len(numbers)/2] if len(numbers) % 2 == 1 else (numbers[len(numbers)/2] + numbers[len(numbers)/2 - 1]) / 2
+    num_mid = len(numbers)//2
+    return (numbers[num_mid] + numbers[~num_mid]) / 2
 
 
 def pierwiastek(x : float, epsilon:float) -> float:
@@ -21,3 +22,4 @@ def make_alpha_dict(alpha: str) -> dict[str, list[str]]:
     
 def flatten(unknown_list : list) -> list:
     return reduce(lambda x, y: x + y, map(flatten, filter(lambda x: isinstance(x, list), unknown_list)),list(filter(lambda x: not isinstance(x, list), unknown_list)))
+
