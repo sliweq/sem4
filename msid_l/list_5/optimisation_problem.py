@@ -12,10 +12,33 @@ from scipy import optimize
 # Implement functions below so that tests are able to pass.
 # ############################################################
 
+from dataclasses import dataclass
+@dataclass
+class Budget():
+    price : int = 13 # zł
+    flesh : float = 1/2 # kg
+    filler : float = 1/3 # kg
+    salt : float = 1/6 # kg 
+    
+@dataclass
+class Traditional:
+    price : int = 25 # zł
+    flesh : float = 9/10 # kg
+    filler : float = 0 # kg
+    salt : float = 1/10 # kg
+    
+@dataclass
+class Delivery:
+    flesh : int = 1000 # kg
+    filler : int = 500 # kg
+    salt : int = 250 # kg
+
+# x_1 - budget / decision_vars[0]
+# x_2 - traditional / decision_vars[1]
 
 def income(x_1: float, x_2: float) -> float:
     """Income from production of flesh."""
-    ...
+    return x_1*Budget.price+x_2*Traditional.price
 
 
 def objective(decision_vars: Tuple[float, float]) -> float:
@@ -26,17 +49,17 @@ def objective(decision_vars: Tuple[float, float]) -> float:
 
 def constr_flesh(decision_vars: Tuple[float, float]) -> float:
     """Constraint according to substrate: flesh."""
-    ...
+    return Delivery.flesh - (decision_vars[0] * Budget.flesh + decision_vars[1] * Traditional.flesh)
 
 
 def constr_filler(decision_vars: Tuple[float, float]) -> float:
     """Constraint according to substrate: filler."""
-    ...
+    return Delivery.filler - (decision_vars[0] * Budget.filler + decision_vars[1] * Traditional.filler)
 
 
 def constr_salt(decision_vars: Tuple[float, float]) -> float:
     """Constraint according to substrate: salt."""
-    ...
+    return Delivery.salt - (decision_vars[0] * Budget.salt + decision_vars[1] * Traditional.salt)
 
 
 def constr_x_1(decision_vars: Tuple[float, float]) -> float:
@@ -46,17 +69,18 @@ def constr_x_1(decision_vars: Tuple[float, float]) -> float:
 
 
 def constr_x_2(decision_vars: Tuple[float, float]) -> float:
-    """Constraint according to x_1 decision variable."""
-    ...
+    """Constraint according to x_1 (2?) decision variable."""
+    _, x_2 = decision_vars
+    return x_2
 
-
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_cobyla.html
 def optimise() -> Tuple[float, float]:
     """Main optimisation method."""
     x_1, x_2 = 0, 0
     x_opt = optimize.fmin_cobyla(
         func=objective,
-        x0=...,
-        cons=...,
+        x0=[x_1,x_2],
+        cons=[constr_x_1,constr_x_2, constr_salt,constr_filler,constr_flesh],
     )
     print(x_opt)
     return x_opt

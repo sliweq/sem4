@@ -10,16 +10,13 @@ def log(level):
 
         def wrapper(*args, **kwargs):
             timer = time.time()
-            if isinstance(func_or_class, type): # class 
+            if isinstance(func_or_class, type):  
                 logger.log(level, f"Initialization {func_or_class.__name__} with args: {args}, kwargs: {kwargs}")
-                insatnce = func_or_class(*args, **kwargs)
-                logger.log(level, f"Created object {func_or_class.__name__} in time {time.time() - timer}.")
-                return insatnce
-            else:  # func 
-                func_name = func_or_class.__name__
-                logger.log(level, f"Called {func_name} with args: {args}, kwargs: {kwargs}")
+                return func_or_class(*args, **kwargs)
+            else: 
+                logger.log(level, f"Called {func_or_class.__name__} with args: {args}, kwargs: {kwargs}")
                 result = func_or_class(*args, **kwargs)
-                logger.log(level, f"Function {func_name} returned {result} in time {time.time() - timer}")
+                logger.log(level, f"Function {func_or_class.__name__} returned {result} in time {time.time() - timer}")
                 return result
 
         return wrapper
