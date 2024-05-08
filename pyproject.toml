@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "sem4"
+version = "0.1.0"
+description = ""
+authors = ["Jakub Śliwka <kubapplll@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+customtkinter = "^5.2.2"
+optional = "^0.0.1"
+datetime = "^5.5"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
