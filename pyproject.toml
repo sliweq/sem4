@@ -10,6 +10,7 @@ python = "^3.12"
 customtkinter = "^5.2.2"
 optional = "^0.0.1"
 datetime = "^5.5"
+ctklistbox = "^1.4"
 
 
 [build-system]
