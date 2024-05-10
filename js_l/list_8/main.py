@@ -11,32 +11,13 @@ from typing import Optional
 customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
 
-# app = customtkinter.CTk()  # create CTk window like you do with the Tk window
-
-# app.grid_columnconfigure(0, weight=1)
-# app.grid_columnconfigure(1, weight=3)
-
-# https_logs_label = customtkinter.CTkLabel(master=app, text="http log file")
-# https_logs_label.grid(row = 0, column = 0, padx = 10, pady = 10, sticky = customtkinter.W)
-# c =  customtkinter.CTkEntry(master=app)
-# c.grid(row = 0, column = 1, padx = 10, pady = 10, sticky = customtkinter.NSEW)
-
-
-# def button_function():
-#     print("button pressed")
-#     if os.path.exists(c.get()):
-#         print("File exists")
-#     else:
-#         print("File does not exist")
-
-# button = customtkinter.CTkButton(master=app, text="CTkButton", command=button_function)
-# # button.place(relx=0.5, rely=0.5, anchor=customtkinter.CENTER)
-# button.grid(row = 0, column = 2, padx = 10, pady = 10, sticky = "ew")
-
-# # Use CTkButton instead of tkinter Button
-
-
-# app.mainloop()
+def open_file(file_name:str) -> list[str]:
+    lines = []
+    with open(file_name, "r") as f:
+        lines = f.readlines()
+    return lines
+    
+    
 
 class HttpLogsApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -47,7 +28,8 @@ class HttpLogsApp(ctk.CTk):
         
         self.file : Optional[str] = None
         
-        self.entry_log = ctk.CTkEntry(master=self)
+        
+        self.entry_log = ctk.CTkEntry(master=self, textvariable=tk.StringVar(value="/home/sliwek/Programowanie/sem4/js_l/list_8/NASA"))
         
         
         https_logs_label = customtkinter.CTkLabel(master=self, text="HTTP log browser", font=("Arial", 25) )
@@ -75,10 +57,25 @@ class HttpLogsApp(ctk.CTk):
         self.button_next.grid(row = 2, column = 8, padx = 10, pady = 10, sticky = "ew")
         
     def next_log(self):
-        print("next log")
+        self.button_prev.configure(state=tk.NORMAL)
+        if self.master_frame.select_next():
+            print("selected next")
+            if self.master_frame.selected_last():
+                self.button_next["state"] = tk.DISABLED
+                self.button_next.configure(state=tk.DISABLED)
+                print("xd")
+        else:
+            print("no more logs")
     
     def prev_log(self):
-        print("prev log")
+        self.button_next.configure(state=tk.NORMAL)
+        if self.master_frame.select_prev():
+            print("selected prev")
+            if self.master_frame.selected_first():
+                self.button_prev.configure(state=tk.DISABLED)
+                
+        else:
+            print("no more logs")
     
     def quit(self):
         sys.exit(0)
@@ -88,6 +85,7 @@ class HttpLogsApp(ctk.CTk):
         if os.path.exists(http_file) and os.path.isfile(http_file):
             self.file = http_file
             print(f"File opened: {self.file}")
+            self.master_frame.set_file(self.file)
         else: 
             print(f"File does not exist: {http_file}")
             
@@ -100,30 +98,87 @@ class MasterFrame(ctk.CTkFrame):
         self.entry_date_from = ctk.CTkEntry(self)
         self.entry_date_from.grid(row = 0, column = 1, pady = 20, padx=20)
         
-        
+        self.file : Optional[str] = None
+            
         self.label_to = customtkinter.CTkLabel(self,text = "To")
         self.label_to.grid(row=0, column=2, pady = 20 ,padx=20)
 
         self.entry_date_to = ctk.CTkEntry(self)
         self.entry_date_to.grid(row = 0, column = 3, pady = 20, padx=20)
         
-        # self.textbox_logs = ctk.CTkTextbox(self)
-        # self.textbox_logs.grid(row = 1, column = 0, columnspan=4, pady = 20, padx=20)
-        # self.textbox_logs_scroll = ctk.CTkScrollbar(self, command=self.textbox_logs.yview)
-        # self.textbox_logs_scroll.grid(row = 1, column = 4, sticky="ns")
-        
-        items = tk.StringVar()
-        items.set([1,2,3,4,132213312132312132312132312312,1,1,1,1,1,1,1,1,1,1,1,1,1])
+        self.sitems = tk.StringVar()
+        # self.sitems.set([1,2,3,4,132213312132312132312132312312,1,1,1,1,1,1,1,1,1,1,1,1,1])
         
         list_frame = ctk.CTkFrame(self)
         
-        scroll = ttk.Scrollbar(list_frame, orient="vertical")
-        scroll.grid(row = 0, column = 4, sticky="ns")
-        listbox = tk.Listbox(master=list_frame, listvariable=items,yscrollcommand=scroll.set, width=70, height=15)
-        scroll.config(command=listbox.yview)
+        self.scroll = ttk.Scrollbar(list_frame, orient="vertical")
+        self.scroll.grid(row = 0, column = 4, sticky="ns")
+        self.listbox = tk.Listbox(master=list_frame, listvariable=self.sitems,yscrollcommand=self.scroll.set, width=70, height=15,exportselection=0)
+        self.scroll.config(command=self.listbox.yview)
         list_frame.grid(row = 1, column = 0, sticky="NSEW", columnspan=4)
         
-        listbox.grid(row = 0, column = 0, columnspan=1, sticky="NSEW")
+        self.listbox.grid(row = 0, column = 0, columnspan=1, sticky="NSEW")
+    
+    def set_file(self, file:str):
+        self.file = file
+        print(f"File set: {self.file}")
+        self.set_items(open_file(file))
+    
+    def set_items(self, items: list[str]):
+        self.sitems.set(items)
+    
+    def select_next(self) -> bool:
+        index =  self.listbox.index("active")
+        if index is not None:
+            self.listbox.selection_clear(index)
+            self.listbox.activate(index + 1)
+            self.listbox.selection_set(index + 1)
+            self.listbox.see(index + 1)
+            return True
+            
+        else:
+            self.listbox.selection_set(0)
+            self.listbox.activate(0)
+            self.listbox.see(0)
+            return True
+    
+    def selected_last(self) -> bool:
+        index =  self.listbox.index("active")
+        
+        if index is not None:
+            if index == self.listbox.size()-1:
+                return True
+            return False
+        else:
+            self.listbox.selection_set(0)
+            self.listbox.activate(0)
+            return False
+        
+    def select_prev(self):
+        index =  self.listbox.index("active")
+        if index is not None:
+            self.listbox.selection_clear(index)
+            self.listbox.activate(index - 1)
+            self.listbox.selection_set(index - 1)
+            self.listbox.see(index - 1)
+            return True
+        else:
+            self.listbox.selection_set(0)
+            self.listbox.activate(0)
+            self.listbox.see(0)
+            return True
+        
+    def selected_first(self) -> bool:
+        index =  self.listbox.index("active")
+        if index is not None:
+            if index == 0:
+                return True
+            return False
+        else:
+            self.listbox.selection_set(0)
+            self.listbox.activate(0)
+            return True
+        
         
 class DetailsFrame(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
