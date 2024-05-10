@@ -5,7 +5,7 @@ from typing import Tuple
 import numpy as np
 import pytest
 
-from optimisation_problem_answers import (
+from optimisation_problem import (
     constr_filler, constr_flesh, constr_salt, constr_x_2, income, optimise
 )
 
