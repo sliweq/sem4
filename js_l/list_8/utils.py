@@ -1,6 +1,12 @@
 from typing import Optional
 import datetime
 
+def open_file(file_name:str) -> list[str]:
+    lines = []
+    with open(file_name, "r") as f:
+        lines = f.readlines()
+    return lines
+
 def get_ip_or_domain(data: str) -> Optional[str]:
     try:
         return data.split()[0]
