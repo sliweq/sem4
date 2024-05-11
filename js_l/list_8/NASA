@@ -113,6 +113,6 @@ dd14-046.compuserve.com - - [01/Jul/1995:00:02:05 -0400] "GET /shuttle/countdown
 port2.electrotex.com - - [01/Jul/1995:00:02:12 -0400] "GET /shuttle/countdown/video/livevideo.gif HTTP/1.0" 200 70712
 199.33.32.50 - - [01/Jul/1995:00:02:12 -0400] "GET /shuttle/countdown/liftoff.html HTTP/1.0" 200 4538
 scheyer.clark.net - - [01/Jul/1995:00:02:13 -0400] "GET /shuttle/missions/sts-71/movies/sts-71-launch-3.mpg HTTP/1.0" 200 130724
-199.33.32.50 - - [01/Jul/1995:00:02:14 -0400] "GET /images/NASA-logosmall.gif HTTP/1.0" 200 786
-dynip42.efn.org - - [01/Jul/1995:00:02:14 -0400] "GET /software HTTP/1.0" 302 -
-remote27.compusmart.ab.ca - - [01/Jul/1995:00:02:14 -0400] "GET /shuttle/missions/sts-71/images/KSC-95EC-0868.gif HTTP/1.0" 200 47122
+199.33.32.50 - - [03/Jul/1995:00:02:14 -0400] "GET /images/NASA-logosmall.gif HTTP/1.0" 200 786
+dynip42.efn.org - - [04/Jul/1995:00:02:14 -0400] "GET /software HTTP/1.0" 302 -
+remote27.compusmart.ab.ca - - [05/Jul/1995:00:02:14 -0400] "GET /shuttle/missions/sts-71/images/KSC-95EC-0868.gif HTTP/1.0" 200 47122

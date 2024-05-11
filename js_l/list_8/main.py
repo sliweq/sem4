@@ -53,27 +53,28 @@ class HttpLogsApp(ctk.CTk):
         self.button_prev = ctk.CTkButton(master=self, text="Prev", command=self.prev_log)
         self.button_next = ctk.CTkButton(master=self, text="Next", command=self.next_log)
         self.button_quit = ctk.CTkButton(master=self, text="Quit", command=self.quit)
+        self.master_frame.set_buttons(self.button_prev, self.button_next)
         
         self.button_quit.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = "w")
         
         self.button_prev.grid(row = 2, column = 7, padx = 10, pady = 10, sticky = "ew")
         self.button_next.grid(row = 2, column = 8, padx = 10, pady = 10, sticky = "ew")
-        
+    
+    
+    
     def next_log(self):
         self.button_prev.configure(state=tk.NORMAL)
         if self.master_frame.select_next():
-            print("selected next")
             if self.master_frame.selected_last():
                 self.button_next["state"] = tk.DISABLED
                 self.button_next.configure(state=tk.DISABLED)
-                print("xd")
+                
         else:
             print("no more logs")
     
     def prev_log(self):
         self.button_next.configure(state=tk.NORMAL)
         if self.master_frame.select_prev():
-            print("selected prev")
             if self.master_frame.selected_first():
                 self.button_prev.configure(state=tk.DISABLED)
                 
@@ -84,6 +85,7 @@ class HttpLogsApp(ctk.CTk):
         sys.exit(0)
         
     def open_file(self):
+        self.master_frame.clear_data()
         http_file = self.entry_log.get()
         if os.path.exists(http_file) and os.path.isfile(http_file):
             self.file = http_file
