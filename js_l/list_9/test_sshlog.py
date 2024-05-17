@@ -3,6 +3,7 @@ from datetime import datetime
 import pytest
 from ipaddress import IPv4Address
 from typing import Optional
+from sshlogjournal import SSHLogJournal
 
 @pytest.mark.parametrize("input, expected", [
     (SSHLogFailedPasswd(pid = 24200, raw_mess ="Dec 10 06:55:48 LabSZ sshd[24200]: Failed password for invalid user webmaster from 173.234.31.186 port 38926 ssh2",
@@ -26,3 +27,20 @@ def test_datetime(input : SSHLogFailedPasswd, expected:Optional[datetime]) -> No
     ])
 def test_ipv4(input: SSHLogEntry, expected:Optional[datetime]) -> None:
     assert input.getIPv4Address() == expected
+
+@pytest.mark.parametrize("input, expected", [
+    ("Dec 10 09:11:34 LabSZ sshd[24447]: Failed password for invalid user 1234 from 103.99.0.122 port 53950 ssh2", SSHLogFailedPasswd),
+    ("Dec 10 09:11:34 LabSZ sshd[24447]: error: Received disconnect from 103.99.0.122: 14: No more user authentication methods available. [preauth]", SSHLogError),
+    ("Dec 10 09:32:20 LabSZ sshd[24680]: Accepted password for fztu from 119.137.62.142 port 49116 ssh2" , SSHLogAcceptedPasswd),
+    ("Dec 10 09:32:35 LabSZ sshd[24787]: pam_unix(sshd:auth): check pass; user unknown",SSHLogOther)
+    
+])
+def test_append(input:str, expected:type) -> None:
+    joutnal = SSHLogJournal()
+    joutnal.append(input)
+    try:
+        
+        assert isinstance(joutnal[0][0],expected)
+    except IndexError:
+        assert False
+    

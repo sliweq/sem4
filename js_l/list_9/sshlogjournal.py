@@ -60,19 +60,19 @@ class SSHLogJournal():
             ip = re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",log)
             self.logs.append(SSHLogAcceptedPasswd(pid=pid,raw_mess=log,time=time,user=user,port=int(ports[0]),ipv4=IPv4Address(ip[0])))
             return True
+        
         if re.findall(error,log):
-            match = re.search(r'[^:]+$', log)
-            if match:
-                text_after_last_colon = match.group(0).strip()
+            matching : Optional[list[str]] = re.findall(r': (\d+):', log)
+            if matching:
                 try:
-                    self.logs.append(SSHLogError(pid=pid,raw_mess=log,time=time,error=int(text_after_last_colon)))
-                except ValueError:
+                    self.logs.append(SSHLogError(pid=pid,raw_mess=log,time=time,error= int(matching[-1])))
+                except (ValueError, ValueError):
                     return False
                 return True
             
         
         self.logs.append(SSHLogOther(pid=pid,raw_mess=log,time=time))
-        return False
+        return True
 
     def get_specified_logs(self,start_date:datetime, end_date:datetime, ip_v4: Optional[IPv4Address] = None ) -> list[SSHLogEntry]:
         new_logs = []
